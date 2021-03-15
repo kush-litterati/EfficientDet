@@ -8,7 +8,7 @@ setup(
     name='Yet-Another-EfficientDet-Pytorch',
     version='0.1.0',
     py_modules=['backbone'],
-    packages=find_packages(include=['efficientdet', 'efficientdet.*', 'efficientnet', 'efficientnet.*', 'backbone', 'utils', 'utils.preprocess_api', 'utils.*']),
+    packages=find_packages(include=['efficientdet', 'efficientdet.*', 'efficientnet', 'efficientnet.*', 'backbone', 'utils', 'utils.*']),
     url='https://github.com/kush-litterati/EfficientDet',
     license='',
     author='zylo117',
