@@ -82,7 +82,7 @@ class ModelWithLoss(nn.Module):
 
 
 def train(opt):
-    params = Params(f'models/projects/{opt.project}.yml')
+    params = Params(f'projects/{opt.project}.yml')
 
     if params.num_gpus == 0:
         os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
@@ -252,7 +252,7 @@ def train(opt):
                     step += 1
 
                     if step % opt.save_interval == 0 and step > 0:
-                        save_checkpoint(model, f'efficientdet-d{opt.compound_coef}_{epoch}_{step}.pth', opt)
+                        save_checkpoint(model, f'efficientdet-d{opt.compound_coef}_{epoch}_{step}.pth')
                         print('checkpoint...')
 
                 except Exception as e:
@@ -300,7 +300,7 @@ def train(opt):
                     best_loss = loss
                     best_epoch = epoch
 
-                    save_checkpoint(model, f'efficientdet-d{opt.compound_coef}_{epoch}_{step}.pth', opt)
+                    save_checkpoint(model, f'efficientdet-d{opt.compound_coef}_{epoch}_{step}.pth')
 
                 model.train()
 
@@ -309,16 +309,22 @@ def train(opt):
                     print('[Info] Stop training at epoch {}. The lowest loss achieved is {}'.format(epoch, best_loss))
                     break
     except KeyboardInterrupt:
-        save_checkpoint(model, f'efficientdet-d{opt.compound_coef}_{epoch}_{step}.pth', opt)
+        save_checkpoint(model, f'efficientdet-d{opt.compound_coef}_{epoch}_{step}.pth')
         writer.close()
     writer.close()
 
 
-def save_checkpoint(model, name, opt):
+def save_checkpoint(model, name):
     if isinstance(model, CustomDataParallel):
         torch.save(model.module.model.state_dict(), os.path.join(opt.saved_path, name))
     else:
         torch.save(model.model.state_dict(), os.path.join(opt.saved_path, name))
+    try:
+        sync_command = "aws s3 sync {} {}".format('/home/ubuntu/EfficientDet/logs/', 's3://litterati-kush-v2-model-logs/')
+        os.system(sync_command)
+        print('saved to s3')
+    except:
+        print('Unable to save to s3')
 
 
 if __name__ == '__main__':
